@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.entity.TestPersonInfoEntity;
+import com.example.demo.entity.User;
 
 /**
  * @author chenrunzheng
@@ -27,6 +28,7 @@ abstract class TestImpl<Q>  {
 
     public abstract TestPersonInfoEntity computePay(String name);
 
+    public abstract User bbb(User user);
     protected abstract String aaa(Q data);
 
 }

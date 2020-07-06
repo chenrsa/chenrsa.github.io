@@ -1,16 +1,8 @@
-import com.example.demo.constant.GetUrlRequest;
-import com.example.demo.constant.QueryAppPicUrlResponse;
 import com.example.demo.http.Httpclient;
-import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 
 /**

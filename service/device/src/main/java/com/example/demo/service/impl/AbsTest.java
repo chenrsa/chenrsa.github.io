@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.entity.TestPersonInfoEntity;
+import com.example.demo.entity.User;
 
 /**
  * @author chenrunzheng
@@ -17,6 +18,12 @@ public class AbsTest extends TestImpl {
     public TestPersonInfoEntity computePay(String name) {
         return null;
     }
+
+    @Override
+    public User bbb(User user) {
+        return null;
+    }
+
 
     @Override
     protected String aaa(Object data) {

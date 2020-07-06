@@ -1,6 +1,5 @@
-package com.example.demo.constant;
+package com.example.demo.entity;
 
-import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,17 +7,15 @@ import lombok.NoArgsConstructor;
 
 /**
  * @author chenrunzheng
- * @since 2020/3/24 15:08
+ * @since 2020/7/3 14:37
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class HelloRequestDto {
-
-    @NotNull
+public class User {
+    private int id;
     private String name;
-
-    @NotNull(message = "age 值错误")
-    private String age;
+    private int age;
+    private String addr;
 }

@@ -3,6 +3,8 @@ package com.example.demo.service.impl;
 import com.example.demo.constant.HelloRequestDto;
 import com.example.demo.constant.UserRegisterEvent;
 import com.example.demo.entity.TestPersonInfoEntity;
+import com.example.demo.entity.User;
+import com.example.demo.mapper.PersonInfoMapper;
 import com.example.demo.repository.TestPersonInfoRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,10 @@ public class Abshello extends TestImpl<HelloRequestDto> {
     @Autowired
     private ApplicationContext applicationContext;
 
+    @Autowired
+    private PersonInfoMapper personInfoMapper;
+
+
     Abshello(TestPersonInfoRepository personInfoRepository){
         super("AA");
         this.personInfoRepository = personInfoRepository;
@@ -33,6 +39,13 @@ public class Abshello extends TestImpl<HelloRequestDto> {
     public TestPersonInfoEntity computePay(String name) {
         applicationContext.publishEvent(new UserRegisterEvent("a"));
         return  personInfoRepository.findFirstByName(name);
+    }
+
+    @Override
+    public User bbb(User user) {
+        applicationContext.publishEvent(new UserRegisterEvent("a"));
+        return personInfoMapper.findUser(user);
+
     }
 
     @Override

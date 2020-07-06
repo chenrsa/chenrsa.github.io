@@ -3,7 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.constant.HelloRequestDto;
 import com.example.demo.constant.HelloResponseDto;
 import com.example.demo.constant.Singleton;
-import com.example.demo.entity.TestPersonInfoEntity;
+import com.example.demo.entity.User;
 import com.example.demo.service.impl.Abshello;
 import io.swagger.annotations.ApiOperation;
 import java.util.Arrays;
@@ -39,7 +39,8 @@ public class TestController {
     @PostMapping("/hi")
     @ApiOperation(value = "aaa",notes = "aaaaaaaddddddd")
     private HelloResponseDto hi(@Validated @RequestBody HelloRequestDto requestDto) {
-        TestPersonInfoEntity entity = abshello.computePay(requestDto.getName());
+      //  TestPersonInfoEntity entity = abshello.computePay(requestDto.getName());
+        User entity = abshello.bbb(User.builder().name(requestDto.getName()).build());
         abshello.hh(requestDto);
         return HelloResponseDto.builder()
                 .addresss(entity.getAddr())
