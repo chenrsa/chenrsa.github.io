@@ -29,6 +29,8 @@ public class TimestampTest {
         String code = String.valueOf((int)((Math.random()*9+1)*100000));
         System.out.println(code);
         System.out.println(s);*/
+        abc:
+
 
         System.out.println(RandomStringUtils.random(6,"0123456789"));
         System.out.println("ccccccccccc");
