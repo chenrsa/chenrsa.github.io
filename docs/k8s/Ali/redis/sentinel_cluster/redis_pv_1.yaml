@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations:
+    pv.kubernetes.io/bound-by-controller: 'yes'
+  creationTimestamp: '2020-03-09T03:18:34Z'
+  finalizers:
+    - kubernetes.io/pv-protection
+  labels:
+    alicloud-pvname: redis-ha1
+  name: redis-ha1
+  resourceVersion: '341753379'
+  selfLink: /api/v1/persistentvolumes/redis-ha1
+  uid: a8c33490-61b4-11ea-92e3-b6068211400b
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 20Gi
+  claimRef:
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    name: data-redis-ha-default-server-1
+    namespace: component-redis
+    resourceVersion: '341750100'
+    uid: 9827cb76-61b4-11ea-92e3-b6068211400b
+  flexVolume:
+    driver: alicloud/nas
+    options:
+      modeType: non-recursive
+      path: /k8s/redisha/1
+      server: 2ac784b08f-wqp63.cn-shenzhen.nas.aliyuncs.com
+      vers: '3'
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: redis-ha
+  volumeMode: Filesystem
+status:
+  phase: Bound

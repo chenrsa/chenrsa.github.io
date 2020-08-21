@@ -1,0 +1,140 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-rtmp-config
+  namespace: siglife-cloud
+data:
+  nginx.conf: |-
+    worker_processes 1;
+    events {
+      worker_connections 1024;
+    }
+    http {
+      include             mime.types;
+      default_type        application/octet-stream;
+      sendfile            on;
+      keepalive_timeout   65;
+      server {
+        listen          8080;
+        server_name     localhost;
+        location /hls {
+          types {
+            application/vnd.apple.mpegurl m3u8;
+            video/mp2t ts;
+          }
+          auth_request /auth_hls;
+          root /tmp;
+          add_header Cache-Control no-cache;
+        }
+        location /auth_hls {
+          internal;
+          proxy_pass_request_body off;
+          proxy_set_header X-Original-URI $request_uri;
+          proxy_set_header Content-Length "";
+          proxy_pass {{ $.Values.nginxRtmp.serviceMediaUrlPreffix }}/media/auth/media_hls_play_auth;
+        }
+        location /stat {
+          auth_basic "Please input password";
+          auth_basic_user_file /usr/local/nginx/conf/password.pw;
+          rtmp_stat all;
+          rtmp_stat_stylesheet stat.xsl;
+        }
+        location /stat.xsl {
+          alias /usr/local/nginx/conf/stat.xsl;
+        }
+        #location /control {
+        #    rtmp_control all;
+        #}
+        error_page  500 502 503 504 /50x.html;
+          location = /50x.html {
+          root html;
+        }
+      }
+    }
+    rtmp {
+      server {
+        listen 1935;
+        chunk_size 4096;
+        application live {
+          live on;
+          record off;
+          on_publish {{ $.Values.nginxRtmp.serviceMediaUrlPreffix }}/media/auth/media_rtmp_publish_auth;
+          on_play {{ $.Values.nginxRtmp.serviceMediaUrlPreffix }}/media/auth/media_rtmp_play_auth;
+          hls on;
+          hls_path /tmp/hls;
+          hls_fragment 10s;
+        }
+      }
+    }
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+{{- if eq $.Values.environment "ali" }}
+  annotations:
+{{- range $key, $value := $.Values.aliLoadBalancerPublicParam }}
+    {{ $key }}: "{{ $value }}"
+{{- end }}
+{{ end }}
+  labels:
+    component: nginx-rtmp
+  name: nginx-rtmp
+  namespace: siglife-cloud
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+    - name: nginx-rtmp-rtmp
+      nodePort: {{ $.Values.nginxRtmp.nodePortRtmp }}
+      port: {{ $.Values.nginxRtmp.externalPortRtmp }}
+      protocol: TCP
+      targetPort: {{ $.Values.nginxRtmp.containerPortRtmp }}
+    - name: nginx-rtmp-http
+      nodePort: {{ $.Values.nginxRtmp.nodePortHttp }}
+      port: {{ $.Values.nginxRtmp.externalPortHttp }}
+      protocol: TCP
+      targetPort: {{ $.Values.nginxRtmp.containerPortHttp }}
+  selector:
+    component: nginx-rtmp
+  sessionAffinity: None
+{{- if eq $.Values.environment "ali" }}
+  type: LoadBalancer
+{{ else }}
+  type: NodePort
+{{ end }}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-rtmp
+  namespace: siglife-cloud
+spec:
+  selector:
+    matchLabels:
+      component: nginx-rtmp
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: nginx-rtmp
+    spec:
+      imagePullSecrets:
+        - name: siglife-docker-registry
+      containers:
+        - name: nginx-rtmp
+          image: nexus.sigsmart.com.cn:8001/cloudv3/nginx-rtmp:{{ $.Values.nginxRtmp.version }}
+          imagePullPolicy: {{ $.Values.nginxRtmp.imagePullPolicy }}
+          ports:
+            - containerPort: {{ $.Values.nginxRtmp.containerPortRtmp }}
+            - containerPort: {{ $.Values.nginxRtmp.containerPortHttp }}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /usr/local/nginx/conf/nginx.conf
+              subPath: nginx.conf
+      volumes:
+        - name: config-volume
+          configMap:
+            name: nginx-rtmp-config

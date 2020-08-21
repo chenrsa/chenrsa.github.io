@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: elasticsearch
+  namespace: kube-system
+  labels:
+    k8s-app: elasticsearch
+spec:
+  serviceName: elasticsearch
+  selector:
+    matchLabels:
+      k8s-app: elasticsearch
+  template:
+    metadata:
+      labels:
+        k8s-app: elasticsearch
+    spec:
+      containers:
+      - image: elasticsearch:7.3.2
+        name: elasticsearch
+        resources:
+          limits:
+            cpu: 1
+            memory: 2Gi
+          requests:
+            cpu: 0.5 
+            memory: 500Mi
+        env:
+          - name: "discovery.type"
+            value: "single-node"
+          - name: ES_JAVA_OPTS
+            value: "-Xms512m -Xmx2g" 
+        ports:
+        - containerPort: 9200
+          name: db
+          protocol: TCP
+        volumeMounts:
+        - name: elasticsearch-data
+          mountPath: /usr/share/elasticsearch/data
+  volumeClaimTemplates:
+  - metadata:
+      name: elasticsearch-data
+    spec:
+      storageClassName: "managed-nfs-storage"
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 20Gi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+  namespace: kube-system
+spec:
+  clusterIP: None
+  ports:
+  - port: 9200
+    protocol: TCP
+    targetPort: db
+  selector:
+    k8s-app: elasticsearch

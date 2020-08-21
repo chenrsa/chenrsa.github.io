@@ -1,0 +1,365 @@
+# Default values for paasv3.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+environment: ali
+#environment: test
+
+externalIp: 112.74.142.217
+#externalIp: 39.99.181.14
+#externalIp: 221.226.113.117
+
+registry:
+  url: nexus.sigsmart.com.cn:8001
+  pullPolicy: Always
+
+persistentVolumeEnable: false
+
+aliLoadBalancerPublicParam:
+  service.beta.kubernetes.io/alibaba-cloud-loadbalancer-id: 15137ff90e7-cn-shenzhen-st3-a01
+  #service.beta.kubernetes.io/alibaba-cloud-loadbalancer-id: lb-8vbiovsg7cnzmzlliy2ph
+  service.beta.kubernetes.io/alibaba-cloud-loadbalancer-spec: slb.s1.small
+  service.beta.kubernetes.io/alibaba-cloud-loadbalancer-force-override-listeners: 'true'
+
+namespaces:
+  - name: siglife-cloud
+    label: siglife-cloud
+  - name: component-emqx
+    label: component
+  - name: component-mysql
+    label: component
+  - name: component-rabbitmq
+    label: component
+  - name: component-redis
+    label: component
+  - name: component-tianbo
+    label: component
+
+deployment:
+  namespace: siglife-cloud
+  version: 3.1.1
+  replicas: 2
+  config: siglife-service-config
+  nbUdpNodePort: 31650
+  repository:
+  - name: connector-mqtt
+    config: siglife-mqtt-config
+    service: false
+    port: 80
+  - name: connector-nb
+    config: siglife-nb-config
+    service: false
+    port: 8095
+  - name: connector-joymeter
+    config: siglife-joymeter-config
+    port: 8094
+  - name: connector-tianbo
+    config: siglife-tianbo-config
+    port: 8092
+  - name: connector-dtang
+    config: siglife-dtang-config
+    port: 8097
+  - name: gateway-command
+    port: 8091
+  - name: service-alarm
+    port: 8089
+  - name: service-device
+    port: 8083
+  - name: service-lock
+    port: 8085
+  - name: service-message
+    port: 8099
+  - name: service-meter
+    port: 8086
+  - name: service-route
+    port: 8093
+  - name: service-user
+    port: 8087
+#  - name: service-media
+#    config: siglife-service-rtmp-config
+#    port: 8096
+
+webportal:
+  version: 3.1.1
+  imagePullPolicy: Always
+  containerPort: 8080
+  nodePort: 30348
+  externalPort: 8443
+  aliLoadBalancerParam:
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-cert-id: 1241138568376497_170a4a721a7_-1602033541_-1505906010
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-health-check-flag: 'on'
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-health-check-interval: '30'
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-health-check-timeout: '5'
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-health-check-type: http
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-health-check-uri: /siglife
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-healthy-threshold: '3'
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-protocol-port: 'https:8443'
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-unhealthy-threshold: '3'
+
+nginx:
+  - name: emqx-nginx
+    namespace: component-emqx
+    replicas: 1
+    version: 3.0.1-SNAPSHOT
+    ports:
+      - name: emqx-ssl
+        containerPort: 443
+        nodePort: 31651
+        externalPort: 7651
+      - name: emqx
+        containerPort: 80
+        nodePort: 31653
+        externalPort: 7653
+    aliLoadBalancerParam:
+
+  - name: gateway-nginx
+    namespace: siglife-cloud
+    replicas: 2
+    version: 3.1.1
+    ports:
+      - name: http
+        containerPort: 80
+        nodePort: 30080
+        externalPort: 7080
+      - name: https
+        nodePort: 30303
+        externalPort: 7443
+        containerPort: 80
+        envFilter: ali
+    aliLoadBalancerParam:
+      service.beta.kubernetes.io/alibaba-cloud-loadbalancer-protocol-port: 'http:7080,https:7443'
+      service.beta.kubernetes.io/alibaba-cloud-loadbalancer-cert-id: 1241138568376497_170a4a721a7_-1602033541_-1505906010
+
+mysql:
+  namespace: component-mysql
+  serviceName: mysql
+  enabled: true
+  nodePort: 31306
+  username: cloud_siglife
+  password: siglife_mysql
+  #rm-8vb7p4h8i665i232v.mysql.zhangbei.rds.aliyuncs.com
+  url: jdbc:mysql://rds16mx4o54721359crh419.mysql.rds.aliyuncs.com:3306/iam_cloud?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+  webportalUrl: jdbc:mysql://rds16mx4o54721359crh419.mysql.rds.aliyuncs.com:3306/iam_cloud?useUnicode=true&characterEncoding=UTF-8
+
+rabbit:
+  dashboardNodePort: 30672
+  ampqNodePort: 31672
+  username: root
+  password: root@123
+  serviceName: rabbitmq-rabbitmq-ha
+  namespace: component-rabbitmq
+  replicas: 3
+
+redis:
+  serviceName: redis-ha-default
+  namespace: component-redis
+  replicas: 3
+  password: siglifeandsigsmart
+
+emqx:
+  namespace: component-emqx
+  serviceName: emqx-tcp-ws
+  dashboardNodePort: 30083
+  tcpNodePort: 31083
+  wsNodePort: 31085
+
+tianbo:
+  version: 1.0.0
+  namespace: component-tianbo
+  serviceName: tianbo
+  containerPort: 1820
+  externalPort: 1820
+  nodePort: 31820
+  aliLoadBalancerParam:
+
+dtang:
+  url: http://api.dtang.com.cn/
+  busiName: 杭州赛客网络科技有限公司
+  busiPhone: 13851846167
+  sercertKey: 653DD262CFE8E686F0BFF8DF413D2203
+
+nginxRtmp:
+  imagePullPolicy: IfNotPresent
+  version: 3.0.3-SNAPSHOT
+  containerPortRtmp: 1935
+  nodePortRtmp: 31935
+  externalPortRtmp: 19350
+  containerPortHttp: 8080
+  nodePortHttp: 31938
+  externalPortHttp: 19380
+  serviceMediaUrlPreffix: http://service-media.siglife-cloud
+
+otherService:
+  - name: emqx-dashboard
+    envFilter: ali
+    namespace: component-emqx
+    labels:
+      component: emqx
+    ports:
+      - name: emqx-dashboard
+        containerPort: 18083
+        nodePort: 30083
+        externalPort: 18083
+    selector:
+      app.kubernetes.io/instance: emqx
+      app.kubernetes.io/name: emqx
+    aliLoadBalancerParam:
+      service.beta.kubernetes.io/alibaba-cloud-loadbalancer-cert-id: 1241138568376497_170a4a721a7_-1602033541_-1505906010
+      service.beta.kubernetes.io/alibaba-cloud-loadbalancer-health-check-flag: 'on'
+      service.beta.kubernetes.io/alibaba-cloud-loadbalancer-health-check-interval: '30'
+      service.beta.kubernetes.io/alibaba-cloud-loadbalancer-health-check-timeout: '5'
+      service.beta.kubernetes.io/alibaba-cloud-loadbalancer-health-check-type: http
+      service.beta.kubernetes.io/alibaba-cloud-loadbalancer-health-check-uri: /
+      service.beta.kubernetes.io/alibaba-cloud-loadbalancer-healthy-threshold: '3'
+      service.beta.kubernetes.io/alibaba-cloud-loadbalancer-protocol-port: 'https:18083'
+      service.beta.kubernetes.io/alibaba-cloud-loadbalancer-unhealthy-threshold: '3'
+  - name: rabbitmq-amqp
+    envFilter: ali
+    namespace: component-rabbitmq
+    labels:
+      app: rabbitmq-ha
+    ports:
+      - name: amqp
+        containerPort: 5672
+        nodePort: 32222
+        externalPort: 5672
+    selector:
+      app: rabbitmq-ha
+  - name: rabbitmq-dashboard
+    envFilter: ali
+    namespace: component-rabbitmq
+    labels:
+      app: rabbitmq-ha
+    ports:
+      - name: dashboard
+        containerPort: 15672
+        nodePort: 31846
+        externalPort: 15672
+    selector:
+      app: rabbitmq-ha
+    aliLoadBalancerParam:
+      service.beta.kubernetes.io/alibaba-cloud-loadbalancer-cert-id: 1241138568376497_170a4a721a7_-1602033541_-1505906010
+      service.beta.kubernetes.io/alibaba-cloud-loadbalancer-health-check-flag: 'on'
+      service.beta.kubernetes.io/alibaba-cloud-loadbalancer-health-check-interval: '30'
+      service.beta.kubernetes.io/alibaba-cloud-loadbalancer-health-check-timeout: '5'
+      service.beta.kubernetes.io/alibaba-cloud-loadbalancer-health-check-type: http
+      service.beta.kubernetes.io/alibaba-cloud-loadbalancer-health-check-uri: /
+      service.beta.kubernetes.io/alibaba-cloud-loadbalancer-healthy-threshold: '3'
+      service.beta.kubernetes.io/alibaba-cloud-loadbalancer-protocol-port: 'https:15672'
+      service.beta.kubernetes.io/alibaba-cloud-loadbalancer-unhealthy-threshold: '3'
+
+nbConfig:
+  #for product env(ali)
+  nb.udp.ali.slb.healthdetect.request: "Healthcheck udp check"
+  nb.udp.ali.slb.healthdetect.response: "up"
+  chinatelecom.baseurl: "https://device.api.ct10649.com"
+  chinatelecom.appid: "3qNwqKWKyYlP9gfr2lFopapIrNca"
+  chinatelecom.secret: "qbgWG6HipyGSwTp4ds2ArPKv9dYa"
+  chinatelecom.manufacturerid: "1001"
+  chinatelecom.baseport: "8743"
+  chinatelecom.key: "lock"
+  chinatelecom.gettokenurl: "/iocm/app/sec/v1.1.0/login"
+  chinatelecom.registerurl: "/iocm/app/reg/v1.1.0/deviceCredentials?appId={appId}"
+  chinatelecom.modifyurl: "/iocm/app/dm/v1.4.0/devices/{iotDeviceId}?appId={appId}"
+  chinatelecom.deleteurl: "/iocm/app/dm/v1.4.0/devices/{iotDeviceId}?appId={appId}"
+  chinatelecom.sendurl: "/iocm/app/cmd/v1.4.0/deviceCommands?appId={appId}"
+  chinatelecom.subscribeurl: "/iocm/app/sub/v1.2.0/subscriptions"
+  chinatelecom.certfile: "mycert.jks"
+  chinatelecom.certpassword: "123456"
+  chinatelecom.certalias: "1"
+  chinatelecom.bswmanufacturerid: "Aramis"
+  chinatelecom.manufacturername: "SIGNetwork"
+  chinatelecom.bswmanufacturername: "Aramis"
+  chinatelecom.model: "SL2D40"
+  chinatelecom.bswmodel: "PW37"
+  chinatelecom.devicetype: "DoorLock"
+  chinatelecom.bswdevicetype: "Smoke"
+  chinatelecom.protocoltype: "CoAP"
+  chinatelecom.callbackip: "http://www.sigsmart.com.cn"
+  chinatelecom.callbackport: "7080"
+  chinatelecom.callbackurl: "/nb/callback/ChinaTelecom"
+  chinaunicom.baseurl: "https://49.4.92.191"
+  chinaunicom.appid: "Wzg6vJTFTGvKxSALqqgVE9fMk6Ua"
+  chinaunicom.secret: "I8ujjoDe3KfqdEO1HfHOZGJwtuMa"
+  chinaunicom.manufacturerid: "bac1bcaead1e4223a58e263477812db5"
+  chinaunicom.baseport: "8743"
+  chinaunicom.key: "lock"
+  chinaunicom.gettokenurl: "/iocm/app/sec/v1.1.0/login"
+  chinaunicom.registerurl: "/iocm/app/reg/v1.1.0/deviceCredentials?appId={appId}"
+  chinaunicom.modifyurl: "/iocm/app/dm/v1.4.0/devices/{iotDeviceId}?appId={appId}"
+  chinaunicom.deleteurl: "/iocm/app/dm/v1.4.0/devices/{iotDeviceId}?appId={appId}"
+  chinaunicom.sendurl: "/iocm/app/cmd/v1.4.0/deviceCommands?appId={appId}"
+  chinaunicom.subscribeurl: "/iocm/app/sub/v1.2.0/subscriptions"
+  chinaunicom.certfile: "mycert.jks"
+  chinaunicom.certpassword: "123456"
+  chinaunicom.certalias: "1"
+  chinaunicom.manufacturername: "SIGNetwork"
+  chinaunicom.model: "SL2D42"
+  chinaunicom.devicetype: "DoorLock"
+  chinaunicom.protocoltype: "CoAP"
+  chinaunicom.callbackip: "http://103.100.211.173"
+  chinaunicom.callbackport: "7080"
+  chinaunicom.callbackurl: "/nb/callback/ChinaUnicom"
+  chinamobile.baseurl: "https://api.heclouds.com"
+  chinamobile.baseport: "443"
+  chinamobile.protocol: "LWM2M"
+  chinamobile.apikey: "7ss1LdCzpHThgGUWfvmd7eQI=gw="
+  chinamobile.registerpath: "/devices"
+  chinamobile.deletepath: "/devices/{iotDeviceId}"
+  chinamobile.sendpath: "/nbiot/execute?imei={imei}&obj_id=3200&obj_inst_id=0&res_id=5750&timeout=40"
+  #for System_test(117)
+#  chinatelecom.baseurl: "https://develop.api.ct10649.com"
+#  chinatelecom.appid: "zdrEfYvy56OTWYl7AY1AfPe6bNca"
+#  chinatelecom.secret: "8gzuwSM7PkAbfuM7ixaJyx1Ne9ga"
+#  chinatelecom.manufacturerid: "1001"
+#  chinatelecom.baseport: "8743"
+#  chinatelecom.key: "lock"
+#  chinatelecom.gettokenurl: "/iocm/app/sec/v1.1.0/login"
+#  chinatelecom.registerurl: "/iocm/app/reg/v1.1.0/deviceCredentials?appId={appId}"
+#  chinatelecom.modifyurl: "/iocm/app/dm/v1.4.0/devices/{iotDeviceId}?appId={appId}"
+#  chinatelecom.deleteurl: "/iocm/app/dm/v1.4.0/devices/{iotDeviceId}?appId={appId}"
+#  chinatelecom.sendurl: "/iocm/app/cmd/v1.4.0/deviceCommands?appId={appId}"
+#  chinatelecom.subscribeurl: "/iocm/app/sub/v1.2.0/subscriptions"
+#  chinatelecom.certfile: "mycert.jks"
+#  chinatelecom.certpassword: "123456"
+#  chinatelecom.certalias: "1"
+#  chinatelecom.bswmanufacturerid: "Aramis"
+#  chinatelecom.manufacturername: "SIGNetwork"
+#  chinatelecom.bswmanufacturername: "Aramis"
+#  chinatelecom.model: "SL2D40"
+#  chinatelecom.bswmodel: "PW37"
+#  chinatelecom.devicetype: "DoorLock"
+#  chinatelecom.bswdevicetype: "Smoke"
+#  chinatelecom.protocoltype: "CoAP"
+#  chinatelecom.callbackip: "http://221.226.113.117"
+#  chinatelecom.callbackport: "7080"
+#  chinatelecom.callbackurl: "/nb/callback/ChinaTelecom"
+#  chinaunicom.baseurl: "https://49.4.92.191"
+#  chinaunicom.appid: "JWz4aqqKlQni27gxhL8tgO64rqEa"
+#  chinaunicom.secret: "vMpWThHNPLAKu0VNn4shGEpPYXQa"
+#  chinaunicom.manufacturerid: "bac1bcaead1e4223a58e263477812db5"
+#  chinaunicom.baseport: "8743"
+#  chinaunicom.key: "lock"
+#  chinaunicom.gettokenurl: "/iocm/app/sec/v1.1.0/login"
+#  chinaunicom.registerurl: "/iocm/app/reg/v1.1.0/deviceCredentials?appId={appId}"
+#  chinaunicom.modifyurl: "/iocm/app/dm/v1.4.0/devices/{iotDeviceId}?appId={appId}"
+#  chinaunicom.deleteurl: "/iocm/app/dm/v1.4.0/devices/{iotDeviceId}?appId={appId}"
+#  chinaunicom.sendurl: "/iocm/app/cmd/v1.4.0/deviceCommands?appId={appId}"
+#  chinaunicom.subscribeurl: "/iocm/app/sub/v1.2.0/subscriptions"
+#  chinaunicom.certfile: "mycert.jks"
+#  chinaunicom.certpassword: "123456"
+#  chinaunicom.certalias: "1"
+#  chinaunicom.manufacturername: "SIGNetwork"
+#  chinaunicom.model: "SL2D42"
+#  chinaunicom.devicetype: "DoorLock"
+#  chinaunicom.protocoltype: "CoAP"
+#  chinaunicom.callbackip: "http://221.226.113.117"
+#  chinaunicom.callbackport: "7080"
+#  chinaunicom.callbackurl: "/nb/callback/ChinaUnicom"
+#  chinamobile.baseurl: "https://api.heclouds.com"
+#  chinamobile.baseport: "443"
+#  chinamobile.protocol: "LWM2M"
+#  chinamobile.apikey: "xSfCXkZpxdIgMWWbsXg42zE=KRc="
+#  chinamobile.registerpath: "/devices"
+#  chinamobile.deletepath: "/devices/{iotDeviceId}"
+#  chinamobile.sendpath: "/nbiot/execute?imei={imei}&obj_id=3200&obj_inst_id=0&res_id=5750&timeout=40"

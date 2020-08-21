@@ -1,0 +1,320 @@
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: connector-joymeter
+  namespace: siglife-cloud
+spec:
+  selector:
+    matchLabels:
+      service: connector-joymeter
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        service: connector-joymeter
+    spec:
+      imagePullSecrets:
+        - name: siglife-docker-registry
+      containers:
+        - name: connector-joymeter
+          image: nexus.sigsmart.com.cn:8001/cloudv3/connector-joymeter:3.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: siglife-joymeter-config
+          ports:
+            - containerPort: 8094
+
+
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: connector-mqtt
+  namespace: siglife-cloud
+spec:
+  selector:
+    matchLabels:
+      service: connector-mqtt
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        service: connector-mqtt
+    spec:
+      imagePullSecrets:
+        - name: siglife-docker-registry
+      containers:
+        - name: connector-mqtt
+          image: nexus.sigsmart.com.cn:8001/cloudv3/connector-mqtt:3.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: siglife-mqtt-config
+
+
+
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: gateway-command
+  namespace: siglife-cloud
+spec:
+  selector:
+    matchLabels:
+      service: gateway-command
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        service: gateway-command
+    spec:
+      imagePullSecrets:
+        - name: siglife-docker-registry
+      containers:
+        - name: gateway-command
+          image: nexus.sigsmart.com.cn:8001/cloudv3/gateway-command:3.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: siglife-service-config
+          ports:
+            - containerPort: 8091
+
+
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: service-alarm
+  namespace: siglife-cloud
+spec:
+  selector:
+    matchLabels:
+      service: service-alarm
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        service: service-alarm
+    spec:
+      imagePullSecrets:
+        - name: siglife-docker-registry
+      containers:
+        - name: service-alarm
+          image: nexus.sigsmart.com.cn:8001/cloudv3/service-alarm:3.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: siglife-service-config
+          ports:
+            - containerPort: 8089
+
+
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: service-device
+  namespace: siglife-cloud
+spec:
+  selector:
+    matchLabels:
+      service: service-device
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        service: service-device
+    spec:
+      imagePullSecrets:
+        - name: siglife-docker-registry
+      containers:
+        - name: service-device
+          image: nexus.sigsmart.com.cn:8001/cloudv3/service-device:3.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: siglife-service-config
+          ports:
+            - containerPort: 8083
+
+
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: service-lock
+  namespace: siglife-cloud
+spec:
+  selector:
+    matchLabels:
+      service: service-lock
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        service: service-lock
+    spec:
+      imagePullSecrets:
+        - name: siglife-docker-registry
+      containers:
+        - name: service-lock
+          image: nexus.sigsmart.com.cn:8001/cloudv3/service-lock:3.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: siglife-service-config
+          ports:
+            - containerPort: 8085
+
+
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: service-message
+  namespace: siglife-cloud
+spec:
+  selector:
+    matchLabels:
+      service: service-message
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        service: service-message
+    spec:
+      imagePullSecrets:
+        - name: siglife-docker-registry
+      containers:
+        - name: service-message
+          image: nexus.sigsmart.com.cn:8001/cloudv3/service-message:3.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: siglife-service-config
+          ports:
+            - containerPort: 8099
+
+
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: service-meter
+  namespace: siglife-cloud
+spec:
+  selector:
+    matchLabels:
+      service: service-meter
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        service: service-meter
+    spec:
+      imagePullSecrets:
+        - name: siglife-docker-registry
+      containers:
+        - name: service-meter
+          image: nexus.sigsmart.com.cn:8001/cloudv3/service-meter:3.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: siglife-service-config
+          ports:
+            - containerPort: 8086
+
+
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: service-route
+  namespace: siglife-cloud
+spec:
+  selector:
+    matchLabels:
+      service: service-route
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        service: service-route
+    spec:
+      imagePullSecrets:
+        - name: siglife-docker-registry
+      containers:
+        - name: service-route
+          image: nexus.sigsmart.com.cn:8001/cloudv3/service-route:3.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: siglife-service-config
+          ports:
+            - containerPort: 8093
+
+
+
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: service-user
+  namespace: siglife-cloud
+spec:
+  selector:
+    matchLabels:
+      service: service-user
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        service: service-user
+    spec:
+      imagePullSecrets:
+        - name: siglife-docker-registry
+      containers:
+        - name: service-user
+          image: nexus.sigsmart.com.cn:8001/cloudv3/service-user:3.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: siglife-service-config
+          ports:
+            - containerPort: 8087
+
+
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: connector-nb
+  namespace: siglife-cloud
+spec:
+  selector:
+    matchLabels:
+      service: connector-nb
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        service: connector-nb
+    spec:
+      imagePullSecrets:
+        - name: siglife-docker-registry
+      containers:
+        - name: connector-nb
+          image: nexus.sigsmart.com.cn:8001/cloudv3/connector-nb:3.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: siglife-nb-config
+          ports:
+            - containerPort: 8095
+              protocol: TCP
+            - containerPort: 7650
+              protocol: UDP

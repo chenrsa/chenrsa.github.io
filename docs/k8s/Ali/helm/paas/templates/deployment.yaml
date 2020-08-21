@@ -1,0 +1,307 @@
+#pull secret
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJuZXh1cy5zaWdzbWFydC5jb20uY246ODAwMSI6eyJ1c2VybmFtZSI6ImRvY2tlci1wdXNoIiwicGFzc3dvcmQiOiJkb2NrZXJAMjAxOSIsImF1dGgiOiJaRzlqYTJWeUxYQjFjMmc2Wkc5amEyVnlRREl3TVRrPSJ9fX0=
+kind: Secret
+metadata:
+  name: siglife-docker-registry
+  namespace: {{ $.Values.deployment.namespace }}
+type: kubernetes.io/dockerconfigjson
+
+#configure
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: siglife-service-config
+  namespace: {{ $.Values.deployment.namespace }}
+data:
+  spring.datasource.url: {{ $.Values.mysql.url }}
+  spring.datasource.username: {{ $.Values.mysql.username }}
+  spring.datasource.password: {{ $.Values.mysql.password }}
+  spring.rabbitmq.host: {{ $.Values.rabbit.serviceName }}.{{ $.Values.rabbit.namespace }}
+  spring.rabbitmq.port: "5672"
+  spring.rabbitmq.username: {{ $.Values.rabbit.username }}
+  spring.rabbitmq.password: {{ $.Values.rabbit.password }}
+  spring.redis.database: "0"
+  spring.redis.sentinel.master: mymaster
+  spring.redis.sentinel.nodes: {{ $.Values.redis.serviceName }}.{{ $.Values.redis.namespace }}:26379
+  spring.redis.password: {{ $.Values.redis.password }}
+  siglife.host.device: "http://service-device"
+  siglife.host.user: "http://service-user"
+  siglife.host.lock: "http://service-lock"
+  siglife.host.gateway: "http://gateway-command"
+  siglife.host.route: "http://service-route"
+  siglife.host.alarm: "http://service-alarm"
+  siglife.host.message: "http://service-message"
+  siglife.host.meter: "http://service-meter"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: siglife-service-rtmp-config
+  namespace: {{ $.Values.deployment.namespace }}
+data:
+  spring.datasource.url: {{ $.Values.mysql.url }}
+  spring.datasource.username: {{ $.Values.mysql.username }}
+  spring.datasource.password: {{ $.Values.mysql.password }}
+  spring.rabbitmq.host: {{ $.Values.rabbit.serviceName }}.{{ $.Values.rabbit.namespace }}
+  spring.rabbitmq.port: "5672"
+  spring.rabbitmq.username: {{ $.Values.rabbit.username }}
+  spring.rabbitmq.password: {{ $.Values.rabbit.password }}
+  spring.redis.database: "0"
+  spring.redis.sentinel.master: mymaster
+  spring.redis.sentinel.nodes: {{ $.Values.redis.serviceName }}.{{ $.Values.redis.namespace }}:26379
+  spring.redis.password: {{ $.Values.redis.password }}
+  siglife.host.device: "http://service-device"
+  siglife.host.user: "http://service-user"
+  siglife.host.lock: "http://service-lock"
+  siglife.host.gateway: "http://gateway-command"
+  siglife.host.route: "http://service-route"
+  siglife.host.alarm: "http://service-alarm"
+  siglife.host.message: "http://service-message"
+  siglife.host.meter: "http://service-meter"
+  rtmp.host.ip: "{{ $.Values.externalIp }}"
+  rtmp.host.port: "{{ $.Values.nginxRtmp.externalPortRtmp }}"
+  rtmp.host.pathpreffix: "live"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: siglife-nb-config
+  namespace: {{ $.Values.deployment.namespace }}
+data:
+  spring.rabbitmq.host: {{ $.Values.rabbit.serviceName }}.{{ $.Values.rabbit.namespace }}
+  spring.rabbitmq.port: "5672"
+  spring.rabbitmq.username: {{ $.Values.rabbit.username }}
+  spring.rabbitmq.password: {{ $.Values.rabbit.password }}
+  spring.redis.database: "0"
+  spring.redis.sentinel.master: mymaster
+  spring.redis.sentinel.nodes: {{ $.Values.redis.serviceName }}.{{ $.Values.redis.namespace }}:26379
+  spring.redis.password: {{ $.Values.redis.password }}
+  spring.datasource.url: {{ $.Values.mysql.url }}
+  spring.datasource.username: {{ $.Values.mysql.username }}
+  spring.datasource.password: {{ $.Values.mysql.password }}
+{{- range $key, $value := $.Values.nbConfig }}
+  {{ $key }}: "{{ $value }}"
+{{- end }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: siglife-mqtt-config
+  namespace: {{ $.Values.deployment.namespace }}
+data:
+  spring.application.name: "mqtt-conn"
+  spring.rabbitmq.host: {{ $.Values.rabbit.serviceName }}.{{ $.Values.rabbit.namespace }}
+  spring.rabbitmq.port: "5672"
+  spring.rabbitmq.username: {{ $.Values.rabbit.username }}
+  spring.rabbitmq.password: {{ $.Values.rabbit.password }}
+  spring.redis.database: "0"
+  spring.redis.sentinel.master: mymaster
+  spring.redis.sentinel.nodes: {{ $.Values.redis.serviceName }}.{{ $.Values.redis.namespace }}:26379
+  spring.redis.password: {{ $.Values.redis.password }}
+  siglife.mqtt.url: "tcp://emqx-tcp-ws.component-emqx:1883"
+  siglife.mqtt.host: {{ $.Values.externalIp }}
+  siglife.mqtt.hostcy: {{ $.Values.externalIp }}
+  siglife.mqtt.port: "7651"
+  siglife.mqtt.portcy: "7653"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: siglife-joymeter-config
+  namespace: {{ $.Values.deployment.namespace }}
+data:
+  spring.datasource.url: {{ $.Values.mysql.url }}
+  spring.datasource.username: {{ $.Values.mysql.username }}
+  spring.datasource.password: {{ $.Values.mysql.password }}
+  spring.rabbitmq.host: {{ $.Values.rabbit.serviceName }}.{{ $.Values.rabbit.namespace }}
+  spring.rabbitmq.port: "5672"
+  spring.rabbitmq.username: {{ $.Values.rabbit.username }}
+  spring.rabbitmq.password: {{ $.Values.rabbit.password }}
+  spring.redis.database: "0"
+  spring.redis.sentinel.master: mymaster
+  spring.redis.sentinel.nodes: {{ $.Values.redis.serviceName }}.{{ $.Values.redis.namespace }}:26379
+  spring.redis.password: {{ $.Values.redis.password }}
+  joymeter.server: "http://139.196.103.205:8787"
+  joymeter.base: "/saike/joy"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: siglife-dtang-config
+  namespace: {{ $.Values.deployment.namespace }}
+data:
+  spring.datasource.url: {{ $.Values.mysql.url }}
+  spring.datasource.username: {{ $.Values.mysql.username }}
+  spring.datasource.password: {{ $.Values.mysql.password }}
+  spring.rabbitmq.host: {{ $.Values.rabbit.serviceName }}.{{ $.Values.rabbit.namespace }}
+  spring.rabbitmq.port: "5672"
+  spring.rabbitmq.username: {{ $.Values.rabbit.username }}
+  spring.rabbitmq.password: {{ $.Values.rabbit.password }}
+  spring.redis.database: "0"
+  spring.redis.sentinel.master: mymaster
+  spring.redis.sentinel.nodes: {{ $.Values.redis.serviceName }}.{{ $.Values.redis.namespace }}:26379
+  spring.redis.password: {{ $.Values.redis.password }}
+  server.dtang.url: {{ $.Values.dtang.url }}
+  server.dtang.busiName: {{ $.Values.dtang.busiName }}
+  server.dtang.busiPhone: {{ $.Values.dtang.busiPhone }}
+  server.dtang.sercertKey: {{ $.Values.dtang.sercertKey }}
+---
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: siglife-tianbo-config
+  namespace: {{ $.Values.deployment.namespace }}
+data:
+  spring.datasource.url: {{ $.Values.mysql.url }}
+  spring.datasource.username: {{ $.Values.mysql.username }}
+  spring.datasource.password: {{ $.Values.mysql.password }}
+  spring.rabbitmq.host: {{ $.Values.rabbit.serviceName }}.{{ $.Values.rabbit.namespace }}
+  spring.rabbitmq.port: "5672"
+  spring.rabbitmq.username: {{ $.Values.rabbit.username }}
+  spring.rabbitmq.password: {{ $.Values.rabbit.password }}
+  spring.redis.database: "0"
+  spring.redis.sentinel.master: mymaster
+  spring.redis.sentinel.nodes: {{ $.Values.redis.serviceName }}.{{ $.Values.redis.namespace }}:26379
+  spring.redis.password: {{ $.Values.redis.password }}
+  server.tb.host: "http://{{ $.Values.tianbo.serviceName }}.{{ $.Values.tianbo.namespace }}:1820"
+#connector-nb network service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: service-nb
+  name: service-nb
+  namespace: {{ $.Values.deployment.namespace }}
+spec:
+  selector:
+    service: connector-nb
+  ports:
+    - name: port-http
+      port: 80
+      protocol: TCP
+      targetPort: 8095
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+{{- if eq $.Values.environment "ali" }}
+  annotations:
+{{- range $key, $value := $.Values.aliLoadBalancerPublicParam }}
+    {{ $key }}: "{{ $value }}"
+{{- end }}
+{{ end }}
+  labels:
+    service: service-nb-udp
+  name: service-nb-udp
+  namespace: {{ $.Values.deployment.namespace }}
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+    - name: port-udp
+      nodePort: {{ $.Values.deployment.nbUdpNodePort }}
+      port: 7650
+      protocol: UDP
+      targetPort: 7650
+  selector:
+    service: connector-nb
+  sessionAffinity: None
+{{- if eq $.Values.environment "ali" }}
+  type: LoadBalancer
+{{ else }}
+  type: NodePort
+{{ end }}
+
+#other module's network service & deployment
+{{- range .Values.deployment.repository }}
+{{- $version := .version | default $.Values.deployment.version }}
+{{- $service := .service | default true }}
+{{- $config := .config | default $.Values.deployment.config }}
+---
+{{- if $service }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: {{ .name }}
+  name: {{ .name }}
+  namespace: {{ $.Values.deployment.namespace }}
+spec:
+  selector:
+    service: {{ .name }}
+  ports:
+    - name: port-1
+      port: 80
+      protocol: TCP
+      targetPort: {{ .port }}
+{{ end }}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Values.deployment.namespace }}
+spec:
+  selector:
+    matchLabels:
+      service: {{ .name }}
+  replicas: {{ $.Values.deployment.replicas }}
+  template:
+    metadata:
+      labels:
+        service: {{ .name }}
+    spec:
+      imagePullSecrets:
+        - name: siglife-docker-registry
+      containers:
+        - name: {{ .name }}
+          image: {{ $.Values.registry.url }}/cloudv3/{{ .name }}:{{ $version }}
+          imagePullPolicy: {{ $.Values.registry.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ $config }}
+          ports:
+            - name: httpport
+              containerPort: {{ .port }}
+              protocol: TCP
+          resources:
+            limits:
+              cpu: '2'
+              memory: 2Gi
+            requests:
+              cpu: 250m
+              memory: 512Mi
+{{- if ne .name "connector-mqtt" }}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: httpport
+              scheme: HTTP
+            initialDelaySeconds: 300
+            timeoutSeconds: 5
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 4
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: httpport
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 54
+{{- end }}
+{{- end }}

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: siglife-nb-config
+  namespace: siglife-cloud
+data:
+  spring.rabbitmq.host: "rabbitmq.component-rabbitmq"
+  spring.rabbitmq.port: "5672"
+  spring.rabbitmq.username: "root"
+  spring.rabbitmq.password: "root@123"
+  spring.redis.database: "0"
+  spring.redis.sentinel.master: mymaster
+  spring.redis.sentinel.nodes: 'redis-ha-default.component-redis:26379'
+  spring.redis.password: ""
+  spring.datasource.url: "jdbc:mysql://mysql.component-mysql:3306/iam_cloud?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai"
+  spring.datasource.username: "root"
+  spring.datasource.password: "root@123"

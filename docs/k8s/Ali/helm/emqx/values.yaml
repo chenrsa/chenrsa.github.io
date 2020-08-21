@@ -1,0 +1,27 @@
+affinity: {}
+serviceName: emqx-tcp-ws
+emqxConfig:
+  EMQX_CLUSTER__K8S__ADDRESS_TYPE: hostname
+  EMQX_CLUSTER__K8S__APISERVER: https://kubernetes.default.svc:443
+  EMQX_CLUSTER__K8S__SUFFIX: svc.cluster.local
+emqxLicneseSecretName: null
+image:
+  pullPolicy: IfNotPresent
+  repository: nexus.sigsmart.com.cn:8001/cloudv3/siglife-emqx
+ingress:
+  annotations: {}
+  enabled: false
+  hosts:
+  - chart-example.local
+  path: /
+  tls: []
+nodeSelector: {}
+persistence:
+  accessMode: ReadWriteOnce
+  enabled: false
+  size: 20Mi
+replicaCount: 3
+resources: {}
+service:
+  type: ClusterIP
+tolerations: []

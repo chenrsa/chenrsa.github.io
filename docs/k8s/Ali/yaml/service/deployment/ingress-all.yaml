@@ -1,0 +1,54 @@
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-all
+  namespace: siglife-cloud
+  annotations:
+    # use the shared ingress-nginx
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+    - hosts:
+      - siglife-cloud.api
+      secretName: siglife-cloud-cert
+  rules:
+    - host: siglife-cloud.api
+      http:
+        paths:
+          - path: /gateway
+            backend:
+              serviceName: gateway-command
+              servicePort: 80
+          - path: /alarm
+            backend:
+              serviceName: service-alarm
+              servicePort: 80
+          - path: /device
+            backend:
+              serviceName: service-device
+              servicePort: 80
+          - path: /lock
+            backend:
+              serviceName: service-lock
+              servicePort: 80
+          - path: /message
+            backend:
+              serviceName: service-message
+              servicePort: 80
+          - path: /meter
+            backend:
+              serviceName: service-meter
+              servicePort: 80
+          - path: /route
+            backend:
+              serviceName: service-route
+              servicePort: 80
+          - path: /user
+            backend:
+              serviceName: service-user
+              servicePort: 80
+          - path: /nb
+            backend:
+              serviceName: service-nb
+              servicePort: 80

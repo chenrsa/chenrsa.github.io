@@ -1,0 +1,23 @@
+#environment: ali
+environment: nfs
+
+nasServer: 2ac784b08f-wqp63.cn-shenzhen.nas.aliyuncs.com
+
+nfs:
+  ip: 192.168.199.242
+  pathPreffix: /home/nfs
+
+mysql:
+  enable: true
+  storageSize: 1Gi
+  path: /mysql/
+
+rabbit:
+  replicas: 3
+  storageSize: 20Gi
+  path: /rabbit/
+
+redis:
+  replicas: 3
+  storageSize: 20Gi
+  path: /redis/

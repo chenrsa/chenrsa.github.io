@@ -1,0 +1,8 @@
+#pull secret
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJuZXh1cy5zaWdzbWFydC5jb20uY246ODAwMSI6eyJ1c2VybmFtZSI6ImRvY2tlci1wdXNoIiwicGFzc3dvcmQiOiJkb2NrZXJAMjAxOSIsImF1dGgiOiJaRzlqYTJWeUxYQjFjMmc2Wkc5amEyVnlRREl3TVRrPSJ9fX0=
+kind: Secret
+metadata:
+  name: siglife-docker-registry
+type: kubernetes.io/dockerconfigjson

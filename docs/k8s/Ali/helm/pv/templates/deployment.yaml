@@ -1,0 +1,95 @@
+{{ if $.Values.persistentVolumeEnable }}
+{{- $replicaCount := int $.Values.redis.replicas}}
+{{- range $index, $element := until $replicaCount }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations:
+    pv.kubernetes.io/bound-by-controller: 'yes'
+    "helm.sh/hook": pre-install
+  finalizers:
+    - kubernetes.io/pv-protection
+  labels:
+    alicloud-pvname: redis-ha{{ $index }}
+  name: redis-ha{{ $index }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 20Gi
+  flexVolume:
+    driver: alicloud/nas
+    options:
+      modeType: non-recursive
+      path: /k8s/redisha/{{ $index }}
+      server: {{ $.Values.nasServer }}
+      vers: '3'
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: redis-ha
+  volumeMode: Filesystem
+---
+{{ end }}
+
+{{- $replicaCount := int $.Values.rabbit.replicas}}
+{{- range $index, $element := until $replicaCount }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations:
+    pv.kubernetes.io/bound-by-controller: 'yes'
+    "helm.sh/hook": pre-install
+  finalizers:
+    - kubernetes.io/pv-protection
+  labels:
+    alicloud-pvname: rabbitmq-ha{{ $index }}
+  name: rabbitmq-ha{{ $index }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 20Gi
+  flexVolume:
+    driver: alicloud/nas
+    options:
+      modeType: non-recursive
+      path: /k8s/rabbitmqha/{{ $index }}
+      server: {{ $.Values.nasServer }}
+      vers: '3'
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: rabbitmq-ha
+  volumeMode: Filesystem
+---
+{{ end }}
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations:
+    pv.kubernetes.io/bound-by-controller: 'yes'
+    "helm.sh/hook": pre-install
+  finalizers:
+    - kubernetes.io/pv-protection
+  labels:
+    alicloud-pvname: mysql
+  name: mysql
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 20Gi
+  flexVolume:
+    driver: alicloud/nas
+    options:
+      mode: '777'
+      modeType: non-recursive
+      path: /k8s/mysql
+      server: {{ $.Values.nasServer }}
+      vers: '3'
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: mysql
+  volumeMode: Filesystem
+
+{{ end }}

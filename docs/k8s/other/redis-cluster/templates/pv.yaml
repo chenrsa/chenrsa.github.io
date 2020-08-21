@@ -1,0 +1,25 @@
+{{- $replicaCount := int $.Values.cluster.nodes}}
+{{- range $index, $element := until $replicaCount }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations:
+    pv.kubernetes.io/bound-by-controller: 'yes'
+  finalizers:
+    - kubernetes.io/pv-protection
+  labels:
+    alicloud-pvname: redis-ha{{ $index }}
+  name: redis-ha{{ $index }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: {{ $.Values.persistence.size }}
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: {{ $.Values.persistence.storageClass }}
+  nfs:
+    server: {{ $.Values.nfs.ip }}
+    path: {{ $.Values.nfs.path }}/pv{{ $index }}
+---
+{{ end }}

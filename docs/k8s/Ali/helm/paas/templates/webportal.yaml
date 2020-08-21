@@ -1,0 +1,147 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: webportal-config
+  namespace: siglife-cloud
+data:
+  jdbc.properties: |-
+    jdbc.driverClassName=com.mysql.jdbc.Driver
+    jdbc.url={{ $.Values.mysql.webportalUrl }}
+    jdbc.username=cloud_siglife
+    jdbc.password=siglife_mysql
+    jdbc.maxActive = 10
+    jdbc.maxIdle =5
+    jdbc.minIdle=1
+    jdbc.initialSize =3
+    jdbc.maxWait =3000
+    jdbc.timeBetweenEvictionRunsMillis=300000
+    jdbc.minEvictableIdleTimeMillis=1800000
+    jdbc.removeAbandoned=true
+  redis.xml: |-
+    <?xml version="1.0" encoding="UTF-8"?>
+    <configs>
+    	<property name="timeout" value="100000" />
+    	<property name="weight" value="1" />
+    	<property name="maxIdle" value="300" />
+    	<property name="maxActive" value="600" />
+    	<property name="maxWait" value="1000" />
+    	<property name="testOnBorrow" value="true" />
+    	<property name="sentinel" value="true" />
+    	<groups>
+    		<group>
+    			<servers>
+    				<server ip="{{ $.Values.redis.serviceName }}.{{ $.Values.redis.namespace }}" port="26379" />
+    			</servers>
+    			<property name="name" value="mymaster"/>
+    			<property name="migrate" value="null"/>
+    			<property name="sValue" value="0"/>
+    		</group>
+    	</groups>
+    </configs>
+  siglife.xml: |-
+    <?xml version="1.0" encoding="UTF-8"?>
+    <configs>
+            <config name="uploadFileUrl" value="/uploadCloudFileClife"/>
+            <config name="devVersionPath" value="/device/"/>
+            <config name="iosVersionPath" value="/ios/"/>
+            <config name="androidVersionPath" value="/android/"/>
+            <config name="manifest_url_prefix" value="itms-services://?action=download-manifest&amp;url="/>
+            <config name="writePwd" value="Sinovatio.moc.www.efilc.2015"/>
+            <config name="aesKey" value="cdfjek34sm349dkjmune8b5TGb0i9sje"/>
+            <config name="authConfigFile" value="auth.xml"/>
+            <config name="redisConfig" value="redis.xml"/>
+            <config name="redisPsw" value=""/>
+            <config name="dmKeepAliveRouter" value="dm_keepalive_router" />
+            <config name="keepAliveTime" value="60" />
+            <config name="devInfoKey" value="DEV_INFOR::" />
+            <config name="iotDevInfoKey" value="iot_dev_infor::" />
+            <config name="aliDevInfoKey" value="ali_dev_infor::" />
+            <config name="iosManifestUrlPrefix" value="itms-services://?action=download-manifest&amp;url="/>
+            <config name="smsUser" value="niumanchun" />
+            <config name="smsPass" value="ae8af767d6e5c26f9900"/>
+            <config name="accessServerUrl" value="http://gateway-nginx.siglife-cloud:7080/cmdid="/>
+            <config name="sourceid" value="webportal123456"/>
+            <config name="resourceServer" value="http://img.sigsmart.com.cn:8442"/>
+            <config name="bannerPath" value="/imgs/siglife/banner"/>
+            <config name="resourceServerIp" value="218.94.82.246"/>
+            <config name="resourceServerPort" value="14213"/>
+            <config name="resourceServerUser" value="cloud10"/>
+            <config name="resourceServerPsw" value="signetwork@456$%^"/>
+            <config name="bannerUploadDestPath" value="/home/cloud10/web/nginx/imgs/siglife/banner"/>
+            <config name="imageProcessServer" value="http://192.168.1.6:8080/SIGLife_Public"/>
+            <config name="fileTmp" value="/home/cloud10/tempPhoto"></config>
+    </configs>
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+{{- if eq $.Values.environment "ali" }}
+  annotations:
+{{- range $key, $value := $.Values.aliLoadBalancerPublicParam }}
+    {{ $key }}: "{{ $value }}"
+{{- end }}
+{{- range $key, $value := $.Values.aliLoadBalancerParam }}
+  {{ $key }}: "{{ $value }}"
+{{- end }}
+{{ end }}
+  labels:
+    service: webportal
+  name: webportal-http
+  namespace: siglife-cloud
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+    - name: port-http
+      nodePort: {{ $.Values.webportal.nodePort }}
+      port: {{ $.Values.webportal.externalPort }}
+      protocol: TCP
+      targetPort: {{ $.Values.webportal.containerPort }}
+  selector:
+    service: webportal
+  sessionAffinity: None
+{{- if eq $.Values.environment "ali" }}
+  type: LoadBalancer
+{{ else }}
+  type: NodePort
+{{ end }}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webportal
+  namespace: siglife-cloud
+spec:
+  selector:
+    matchLabels:
+      service: webportal
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: webportal
+    spec:
+      imagePullSecrets:
+        - name: siglife-docker-registry
+      containers:
+        - name: webportal
+          image: nexus.sigsmart.com.cn:8001/siglife/siglife-webportal:{{ $.Values.webportal.version }}
+          imagePullPolicy: {{ $.Values.webportal.imagePullPolicy }}
+          ports:
+            - containerPort: {{ $.Values.webportal.containerPort }}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /usr/local/tomcat/webapps/siglife/WEB-INF/classes/jdbc.properties
+              subPath: jdbc.properties
+            - name: config-volume
+              mountPath: /usr/local/tomcat/webapps/siglife/WEB-INF/classes/redis.xml
+              subPath: redis.xml
+            - name: config-volume
+              mountPath: /usr/local/tomcat/webapps/siglife/WEB-INF/classes/siglife.xml
+              subPath: siglife.xml
+      volumes:
+        - name: config-volume
+          configMap:
+            name: webportal-config

@@ -1,0 +1,45 @@
+{{- range $.Values.otherService }}
+{{- $envFilter := .envFilter | default $.Values.environment }}
+{{- if eq $envFilter $.Values.environment }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+{{- if eq $.Values.environment "ali" }}
+  annotations:
+{{- range $key, $value := $.Values.aliLoadBalancerPublicParam }}
+    {{ $key }}: "{{ $value }}"
+{{- end }}
+{{- range $key, $value := .aliLoadBalancerParam }}
+    {{ $key }}: "{{ $value }}"
+{{- end }}
+{{ end }}
+  labels:
+{{- range $key, $value := .labels }}
+    {{ $key }}: "{{ $value }}"
+{{- end }}
+  name: {{ .name }}
+  namespace: {{ .namespace }}
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+{{- range .ports }}
+    - name: {{ .name }}
+      nodePort: {{ .nodePort }}
+      port: {{ .externalPort }}
+      protocol: TCP
+      targetPort: {{ .containerPort }}
+{{ end }}
+  selector:
+{{- range $key, $value := .selector }}
+    {{ $key }}: "{{ $value }}"
+{{- end }}
+  sessionAffinity: None
+{{- if eq $.Values.environment "ali" }}
+  type: LoadBalancer
+{{ else }}
+  type: NodePort
+---
+{{ end }}
+{{ end }}
+{{ end }}

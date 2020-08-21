@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-nginx
+  namespace: siglife-cloud
+spec:
+  selector:
+    matchLabels:
+      service: gateway-nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: gateway-nginx
+    spec:
+      imagePullSecrets:
+        - name: siglife-docker-registry
+      containers:
+        - name: gateway-nginx
+          image: nexus.sigsmart.com.cn:8001/cloudv3/gateway-nginx:3.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80

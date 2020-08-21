@@ -1,0 +1,78 @@
+#pull secret
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJuZXh1cy5zaWdzbWFydC5jb20uY246ODAwMSI6eyJ1c2VybmFtZSI6ImRvY2tlci1wdXNoIiwicGFzc3dvcmQiOiJkb2NrZXJAMjAxOSIsImF1dGgiOiJaRzlqYTJWeUxYQjFjMmc2Wkc5amEyVnlRREl3TVRrPSJ9fX0=
+kind: Secret
+metadata:
+  name: siglife-docker-registry
+  namespace: {{ $.Values.emqx.namespace }}
+type: kubernetes.io/dockerconfigjson
+
+
+{{- range .Values.nginx }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+{{- if eq $.Values.environment "ali" }}
+  annotations:
+{{- range $key, $value := $.Values.aliLoadBalancerPublicParam }}
+    {{ $key }}: "{{ $value }}"
+{{- end }}
+{{- range $key, $value := .aliLoadBalancerParam }}
+    {{ $key }}: "{{ $value }}"
+{{- end }}
+{{ end }}
+  labels:
+    component: {{ .name }}
+    type: LoadBalancer
+  name: {{ .name }}
+  namespace: {{ .namespace }}
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+{{- range .ports }}
+{{- $envFilter := .envFilter | default $.Values.environment }}
+{{- if eq $envFilter $.Values.environment }}
+    - name: {{ .name }}
+      nodePort: {{ .nodePort }}
+      port: {{ .externalPort }}
+      protocol: TCP
+      targetPort: {{ .containerPort }}
+{{ end }}
+{{ end }}
+  selector:
+    component: {{ .name }}
+  sessionAffinity: None
+{{- if eq $.Values.environment "ali" }}
+  type: LoadBalancer
+{{ else }}
+  type: NodePort
+{{ end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .name }}
+  namespace: {{ .namespace }}
+spec:
+  selector:
+    matchLabels:
+      component: {{ .name }}
+  replicas: {{ .replicas }}
+  template:
+    metadata:
+      labels:
+        component: {{ .name }}
+    spec:
+      imagePullSecrets:
+        - name: siglife-docker-registry
+      containers:
+        - name: {{ .name }}
+          image: nexus.sigsmart.com.cn:8001/cloudv3/{{ .name }}:{{ .version }}
+          imagePullPolicy: Always
+          ports:
+{{- range .ports }}
+            - containerPort: {{ .containerPort }}
+{{ end }}
+{{ end }}

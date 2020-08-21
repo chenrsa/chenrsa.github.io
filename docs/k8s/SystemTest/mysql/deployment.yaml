@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: component-mysql
+  labels:
+    app.kubernetes.io/name: component
+    app.kubernetes.io/part-of: component
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-pv
+  namespace: component-mysql
+spec:
+  accessModes:
+    - ReadWriteOnce        #访问模式定义为只能以读写的方式挂载到单个节点
+  capacity:
+    storage: 1Gi
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs
+  nfs:
+    server: 192.168.199.237
+    path: /root/nfs/data/mysql
+
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  namespace: component-mysql
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: nfs
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: component-mysql
+spec:
+  selector:
+    matchLabels:
+      component: mysql
+  template:
+    metadata:
+      labels:
+        component: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: root@123
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    component: mysql
+  name: mysql
+  namespace: component-mysql
+spec:
+  type: NodePort
+  ports:
+    - name: port-mysql
+      port: 3306
+      protocol: TCP
+      targetPort: 3306
+      nodePort: 31306
+  selector:
+    component: mysql

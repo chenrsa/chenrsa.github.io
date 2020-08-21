@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: service-device
+  namespace: siglife-cloud
+spec:
+  selector:
+    matchLabels:
+      service: service-device
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        service: service-device
+    spec:
+      imagePullSecrets:
+        - name: siglife-docker-registry
+      containers:
+      - name: service-device
+        image: nexus.sigsmart.com.cn:8001/cloudv3/service-device:3.0.1-SNAPSHOT
+        imagePullPolicy: Always
+        envFrom:
+          - configMapRef:
+              name: siglife-service-config
+        ports:
+        - containerPort: 8083
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: service-device
+  name: service-device
+  namespace: siglife-cloud
+spec:
+  selector:
+    service: service-device
+  ports:
+  - name: port-1
+    port: 80
+    protocol: TCP
+    targetPort: 8083

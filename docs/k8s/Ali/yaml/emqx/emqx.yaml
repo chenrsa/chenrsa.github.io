@@ -1,0 +1,69 @@
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: component-emqx-rbac
+  namespace: component-emqx
+rules:
+  - apiGroups: [""]
+    resources: ["endpoints"]
+    verbs: ["get"]
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: component-emqx-rbac
+  namespace: component-emqx
+subjects:
+  - kind: ServiceAccount
+    name: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: component-emqx-rbac
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emqx
+  namespace: component-emqx
+  labels:
+    app: emqx
+spec:
+  selector:
+    matchLabels:
+      component: emqx
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        component: emqx
+        app: emqx
+    spec:
+      containers:
+        - name: emqx
+          image: emqx/emqx:latest
+          ports:
+            - containerPort: 8883  #mqtt:ssl not exposed
+            - containerPort: 1883  #mqtt:tcp
+            - containerPort: 18083  #http:dashboard
+            - containerPort: 8080  #http:management not exposed
+            - containerPort: 8083  #mqtt:ws
+            - containerPort: 8084  #mqtt:wss not exposed
+          env:
+            - name: EMQX_CLUSTER__DISCOVERY
+              value: k8s
+            - name: EMQX_NAME
+              value: emqx
+            - name: EMQX_CLUSTER__K8S__APISERVER
+              value: https://172.18.20.211:6443
+            - name: EMQX_CLUSTER__K8S__NAMESPACE
+              value: component-emqx
+            - name: EMQX_CLUSTER__K8S__SERVICE_NAME
+              value: emqx-dashboard
+            - name: EMQX_CLUSTER__K8S__ADDRESS_TYPE
+              value: ip
+            - name: EMQX_CLUSTER__K8S__APP_NAME
+              value: emqx

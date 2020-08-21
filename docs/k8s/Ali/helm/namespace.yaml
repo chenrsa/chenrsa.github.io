@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: siglife-cloud
+  labels:
+    app.kubernetes.io/name: siglife-cloud
+    app.kubernetes.io/part-of: siglife-cloud
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: component-emqx
+  labels:
+    app.kubernetes.io/name: component
+    app.kubernetes.io/part-of: component
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: component-mysql
+  labels:
+    app.kubernetes.io/name: component
+    app.kubernetes.io/part-of: component
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: component-rabbitmq
+  labels:
+    app.kubernetes.io/name: component
+    app.kubernetes.io/part-of: component
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: component-redis
+  labels:
+    app.kubernetes.io/name: component
+    app.kubernetes.io/part-of: component
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: component-tianbo
+  labels:
+    app.kubernetes.io/name: component
+    app.kubernetes.io/part-of: component
+---

@@ -1,0 +1,61 @@
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: tianbo
+  namespace: {{ $.Values.tianbo.namespace }}
+spec:
+  selector:
+    matchLabels:
+      service: tianbo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: tianbo
+    spec:
+      imagePullSecrets:
+        - name: siglife-docker-registry
+      containers:
+      - name: tianbo-mid
+        image: nexus.sigsmart.com.cn:8001/cloudv3/tianbo-mid:{{ $.Values.tianbo.version }}
+        imagePullPolicy: Always
+#        envFrom:
+#          - configMapRef:
+#              name: siglife-service-config
+        ports:
+        - containerPort: {{ $.Values.tianbo.containerPort }}
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+{{- if eq $.Values.environment "ali" }}
+  annotations:
+{{- range $key, $value := $.Values.aliLoadBalancerPublicParam }}
+    {{ $key }}: "{{ $value }}"
+{{- end }}
+{{- range $key, $value := .aliLoadBalancerParam }}
+    {{ $key }}: "{{ $value }}"
+{{- end }}
+{{ end }}
+  labels:
+    service: tianbo
+  name: tianbo
+  namespace: {{ $.Values.tianbo.namespace }}
+spec:
+  selector:
+    service: tianbo
+  sessionAffinity: None
+  externalTrafficPolicy: Cluster
+  ports:
+  - name: port-1
+    port: {{ $.Values.tianbo.externalPort }}
+    protocol: TCP
+    targetPort: {{ $.Values.tianbo.containerPort }}
+    nodePort: {{ $.Values.tianbo.nodePort }}
+{{- if eq $.Values.environment "ali" }}
+  type: LoadBalancer
+{{ else }}
+  type: NodePort
+{{ end }}

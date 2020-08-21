@@ -1,0 +1,203 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: service-user
+  name: service-user
+  namespace: siglife-cloud
+spec:
+  selector:
+    service: service-user
+  ports:
+    - name: port-1
+      port: 80
+      protocol: TCP
+      targetPort: 8087
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: service-route
+  name: service-route
+  namespace: siglife-cloud
+spec:
+  selector:
+    service: service-route
+  ports:
+    - name: port-1
+      port: 80
+      protocol: TCP
+      targetPort: 8093
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: service-meter
+  name: service-meter
+  namespace: siglife-cloud
+spec:
+  selector:
+    service: service-meter
+  ports:
+    - name: port-1
+      port: 80
+      protocol: TCP
+      targetPort: 8086
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: service-message
+  name: service-message
+  namespace: siglife-cloud
+spec:
+  selector:
+    service: service-message
+  ports:
+    - name: port-1
+      port: 80
+      protocol: TCP
+      targetPort: 8099
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: service-lock
+  name: service-lock
+  namespace: siglife-cloud
+spec:
+  selector:
+    service: service-lock
+  ports:
+    - name: port-1
+      port: 80
+      protocol: TCP
+      targetPort: 8085
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: service-device
+  name: service-device
+  namespace: siglife-cloud
+spec:
+  selector:
+    service: service-device
+  ports:
+    - name: port-1
+      port: 80
+      protocol: TCP
+      targetPort: 8083
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: service-alarm
+  name: service-alarm
+  namespace: siglife-cloud
+spec:
+  selector:
+    service: service-alarm
+  ports:
+    - name: port-1
+      port: 80
+      protocol: TCP
+      targetPort: 8089
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: gateway-command
+  name: gateway-command
+  namespace: siglife-cloud
+spec:
+  selector:
+    service: gateway-command
+  ports:
+    - name: port-1
+      port: 80
+      protocol: TCP
+      targetPort: 8091
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: service-joymeter
+  name: service-joymeter
+  namespace: siglife-cloud
+spec:
+  selector:
+    service: connector-joymeter
+  ports:
+    - name: port-1
+      port: 80
+      protocol: TCP
+      targetPort: 8094
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: service-nb
+  name: service-nb
+  namespace: siglife-cloud
+spec:
+  selector:
+    service: connector-nb
+  ports:
+    - name: port-http
+      port: 80
+      protocol: TCP
+      targetPort: 8095
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-id: lb-wz9if91dln0fcjafpl8v6
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-spec: slb.s1.small
+  labels:
+    service: service-nb-udp
+  name: service-nb-udp
+  namespace: siglife-cloud
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+    - name: port-udp
+      nodePort: 31650
+      port: 7650
+      protocol: UDP
+      targetPort: 7650
+  selector:
+    service: connector-nb
+  sessionAffinity: None
+  type: LoadBalancer

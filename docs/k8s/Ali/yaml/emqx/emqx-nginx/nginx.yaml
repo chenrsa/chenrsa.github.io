@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emqx-nginx
+  namespace: component-emqx
+spec:
+  selector:
+    matchLabels:
+      component: emqx-nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: emqx-nginx
+    spec:
+      imagePullSecrets:
+        - name: siglife-docker-registry
+      containers:
+        - name: emqx-nginx
+          image: nexus.sigsmart.com.cn:8001/cloudv3/emqx-nginx:3.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 443

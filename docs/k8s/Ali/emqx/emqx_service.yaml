@@ -1,0 +1,48 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-id: lb-wz9if91dln0fcjafpl8v6
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-spec: slb.s1.small
+  labels:
+    component: emqx
+  name: emqx-dashboard
+  namespace: component-emqx
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+    - name: port-dashboard
+      nodePort: 30083
+      port: 18083
+      protocol: TCP
+      targetPort: 18083
+  selector:
+    component: emqx
+  sessionAffinity: None
+  type: LoadBalancer
+
+---
+#this service build for nginx-ingress,see ingress-nginx/ConfigMap/tcp-services
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    component: emqx
+  name: emqx-tcp-ws
+  namespace: component-emqx
+spec:
+  type: NodePort
+  selector:
+    component: emqx
+  ports:
+    - name: port-tcp
+      port: 1883
+      protocol: TCP
+      targetPort: 1883
+      nodePort: 31083
+    - name: port-ws
+      port: 8083
+      protocol: TCP
+      targetPort: 8083
+      nodePort: 31085

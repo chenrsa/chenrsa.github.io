@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: siglife-mqtt-config
+  namespace: siglife-cloud
+data:
+  spring.application.name: "mqtt-conn"
+  spring.rabbitmq.host: "rabbitmq.component-rabbitmq"
+  spring.rabbitmq.port: "5672"
+  spring.rabbitmq.username: "root"
+  spring.rabbitmq.password: "root@123"
+  spring.redis.database: "0"
+  spring.redis.sentinel.master: mymaster
+  spring.redis.sentinel.nodes: 'redis-ha-default.component-redis:26379'
+  spring.redis.password: ""
+  siglife.mqtt.url: "tcp://emqx-tcp-ws.component-emqx:1883"
+  siglife.mqtt.host: "39.108.249.126"
+  siglife.mqtt.hostcy: "39.108.249.126"
+  siglife.mqtt.port: "7651"
+  siglife.mqtt.portcy: "7653"
