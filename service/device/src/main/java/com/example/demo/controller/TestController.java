@@ -1,17 +1,14 @@
 package com.example.demo.controller;
 
-import com.example.demo.constant.HelloRequestDto;
-import com.example.demo.constant.HelloResponseDto;
 import com.example.demo.constant.Singleton;
-import com.example.demo.entity.User;
 import com.example.demo.service.impl.Abshello;
 import io.swagger.annotations.ApiOperation;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/springtest")
+@Slf4j
 public class TestController {
 
     @Autowired
@@ -38,14 +36,16 @@ public class TestController {
 
     @PostMapping("/hi")
     @ApiOperation(value = "aaa",notes = "aaaaaaaddddddd")
-    private HelloResponseDto hi(@Validated @RequestBody HelloRequestDto requestDto) {
+    private String hi(Map requestDto) {
+        log.info(requestDto.toString());
       //  TestPersonInfoEntity entity = abshello.computePay(requestDto.getName());
-        User entity = abshello.bbb(User.builder().name(requestDto.getName()).build());
+       /* User entity = abshello.bbb(User.builder().name(requestDto.getName()).build());
         abshello.hh(requestDto);
         return HelloResponseDto.builder()
                 .addresss(entity.getAddr())
                 .name(entity.getName())
-                .build();
+                .build();*/
+       return null;
     }
 
 }

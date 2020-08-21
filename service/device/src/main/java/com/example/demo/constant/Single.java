@@ -13,7 +13,7 @@ package com.example.demo.constant;
     {
         return s;
     }*/
-    private static Single s = null;
+ /*   private static Single s = null;
     private Single(){}
     public static Single getInstance()
     {
@@ -26,5 +26,19 @@ package com.example.demo.constant;
             }
         }
         return s;
-    }
+    }*/
+        private static Single instance=null;
+
+        private Single() {};
+
+        public static  Single getInstance(){
+
+            if (instance == null) {
+                synchronized (Single.class) {
+                    instance=new Single();
+                }
+            }
+            return instance;
+        }
+
 }

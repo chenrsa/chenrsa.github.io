@@ -1,5 +1,4 @@
 import com.example.demo.constant.CallableThread;
-import com.example.demo.constant.MyThread;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import org.junit.Test;
@@ -10,16 +9,20 @@ import org.junit.Test;
  */
 public class TestThread{
 
+    private volatile int a = 10;
+
     @Test
     public void test() throws InterruptedException {
 
-        /*System.out.println("ffffffffffffffffff");
+       /* System.out.println("ffffffffffffffffff");
         ThreadTest threadTest = new ThreadTest("Thread-1");
         threadTest.start();
+
         ThreadCon threadTest1 = new ThreadCon("Thread-2");
         threadTest1.start();
+
         Thread.sleep(500);
-        System.out.println("aaaaaaaaaaaaaaa");*/
+        System.out.println("aaaaaaaaaaaaaaa");
 
 
         MyThread t = new MyThread();
@@ -33,7 +36,7 @@ public class TestThread{
         c.start();
         d.start();
         e.start();
-        Thread.sleep(500);
+        Thread.sleep(500);*/
 
 
 
@@ -47,9 +50,12 @@ public class TestThread{
 
         try {
             Integer sum = result.get();
+            System.out.println("sum == " + sum);
         } catch (ExecutionException ex) {
             ex.printStackTrace();
         }
+
+
     }
 
 
