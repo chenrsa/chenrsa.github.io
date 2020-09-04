@@ -1,6 +1,6 @@
-import java.sql.Date;
+
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
+import java.util.Date;
 import org.junit.Test;
 
 /**
@@ -21,17 +21,21 @@ public class TimestampTest {
         System.out.println(timestamp.getTime()/1000);
         System.out.println(timestamp.getHours());
 
-        Date date = new Date(timestamp.getTime());
+        /*Date date = new Date(timestamp.getTime());
         System.out.println(date);
         SimpleDateFormat dateFormat = new SimpleDateFormat();
         SimpleDateFormat myFmt1=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        System.out.println(myFmt1.format(date));
+        System.out.println(myFmt1.format(date));*/
 
         /*Random random = new Random();
         Integer s = random.nextInt(899999) + 100000;
         String code = String.valueOf((int)((Math.random()*9+1)*100000));
         System.out.println(code);
         System.out.println(s);*/
+
+
+       Date d = new Date();
+       System.out.println(d);
 
 
     }
