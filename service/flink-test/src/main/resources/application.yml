@@ -1,0 +1,7 @@
+
+
+Spring:
+  rabbitmq:
+    host: 192.168.199.240
+    username: root
+    password: root@123

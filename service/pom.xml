@@ -17,6 +17,7 @@
     <modules>
         <module>device</module>
         <module>hello</module>
+        <module>flink-test</module>
     </modules>
 
     <dependencies>

@@ -43,6 +43,11 @@ public class Testfor {
         System.out.println(calendar.get(Calendar.DAY_OF_YEAR));
         calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
         System.out.println(calendar.get(Calendar.DAY_OF_YEAR));
+
+        String s  = "您好，【3楼门禁】门禁出现人员【chenrunz】的体温过高告警，请立刻核实！";
+
+        String msg = s.substring(s.indexOf("人员【") + 3,s.indexOf("】的体温"));
+        System.out.println(msg);
     }
 
 
