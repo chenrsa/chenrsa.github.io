@@ -1,4 +1,7 @@
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.Unpooled;
 import java.sql.Timestamp;
 import java.util.Date;
 import org.junit.Test;
@@ -36,6 +39,19 @@ public class TimestampTest {
 
        Date d = new Date();
        System.out.println(d);
+
+
+         String cardNum = "111222";
+            ByteBuf buf = Unpooled.buffer(4);
+            byte[] tag = ByteBufUtil.decodeHexDump(cardNum);
+            buf.writeBytes(tag);
+            long value = buf.readUnsignedIntLE();
+            StringBuilder sb = new StringBuilder(String.valueOf(value));
+            while (sb.length() < 10) {
+                sb.insert(0, "0");
+            }
+            System.out.println(sb);
+
 
 
     }
