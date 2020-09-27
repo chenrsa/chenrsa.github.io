@@ -21,4 +21,6 @@ public class HelloRequestDto {
 
     @NotNull(message = "age 值错误")
     private String age;
+
+    private AlarmType1 alarmType;
 }

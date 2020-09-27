@@ -41,7 +41,7 @@ public class TimestampTest {
        System.out.println(d);
 
 
-         String cardNum = "111222";
+         String cardNum = "11122222";
             ByteBuf buf = Unpooled.buffer(4);
             byte[] tag = ByteBufUtil.decodeHexDump(cardNum);
             buf.writeBytes(tag);
@@ -52,7 +52,10 @@ public class TimestampTest {
             }
             System.out.println(sb);
 
-
+    Long time1 = 1600843258L;
+    Long time2 = 1600573258L;
+    Integer days = Math.toIntExact((time1 - time2) / (3600 * 24));
+    System.out.println(days);
 
     }
 }
