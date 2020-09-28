@@ -1,8 +1,11 @@
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import org.junit.Test;
 
@@ -52,10 +55,17 @@ public class TimestampTest {
             }
             System.out.println(sb);
 
-    Long time1 = 1600843258L;
-    Long time2 = 1600573258L;
-    Integer days = Math.toIntExact((time1 - time2) / (3600 * 24));
-    System.out.println(days);
+    Long time1 = 1600843258000L;
+    Long time2 = 1600573258000L;
+    //Integer days = Math.toIntExact((time1 - time2) / (3600 * 24));
+   // System.out.println(days);
+
+
+        LocalDateTime start = Instant.ofEpochMilli(time1).atZone(ZoneOffset.ofHours(8)).toLocalDateTime();
+        LocalDateTime end = Instant.ofEpochMilli(time2)
+                .atZone(ZoneOffset.ofHours(8)).toLocalDateTime();
+        long day = Duration.between(start, end).toDays();
+        System.out.println("day = " + day);
 
     }
 }
