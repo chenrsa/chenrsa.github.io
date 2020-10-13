@@ -2,6 +2,7 @@ package com.example.demo;
 
 
 import com.example.demo.annoation.SiglifeApplication;
+import com.example.demo.annoation.EnableTimer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -13,6 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SiglifeApplication
 @EnableScheduling
+@EnableTimer
 public class DeviceServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(DeviceServiceApplication.class, args);
